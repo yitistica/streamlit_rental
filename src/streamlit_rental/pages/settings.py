@@ -3,7 +3,7 @@ from streamlit_rental.utils.sys import check_if_dir_exists, get_working_director
     set_working_directory, get_child_directories, join_paths
 from streamlit_rental.rental.init_application import create_app
 
-from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH
+from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH, DB_NAME
 
 
 def _status_indication():
@@ -30,6 +30,7 @@ def set_workspace():
 def set_app_dir(directory, app_name):
     STATE_DICT['configs']['app_name'] = app_name
     STATE_DICT['configs']['app_path'] = join_paths(directory, app_name)
+    STATE_DICT['configs']['app_db_path'] = join_paths(STATE_DICT['configs']['app_path'], DB_NAME)
 
 
 def set_app():
@@ -70,7 +71,7 @@ def main():
     with my_expander:
         set_workspace()
 
-    my_expander = st.beta_expander("选择 APP", expanded=False)
+    my_expander = st.beta_expander("选择管理 APP", expanded=False)
     with my_expander:
         set_app()
 

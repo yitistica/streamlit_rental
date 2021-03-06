@@ -18,26 +18,3 @@ def create_Session(db_path, echo=True):
     Session = sessionmaker()
     Session.configure(bind=engine)
     return Session
-
-
-# engine = create_lite_engine(db_path='C:/Users/yeech/Desktop/streamlit_rental_working_directory/a.db')
-
-
-
-#
-# from sqlalchemy.orm import sessionmaker
-#
-#
-# Session = sessionmaker()
-# Session.configure(bind=engine)
-# session = Session()
-#
-# customer = Customer()
-# customer.surname = 'abc'
-# customer.given_name = 'de'
-# customer.nid = 'sasafa'
-# customer.date_of_birth = datetime.datetime.now()
-#
-# session.add(customer)
-# session.commit()
-# session.close()

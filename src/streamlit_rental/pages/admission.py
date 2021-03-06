@@ -7,7 +7,3 @@ def main():
     with my_expander:
         st.markdown(STATE_DICT)
 
-
-
-
-
