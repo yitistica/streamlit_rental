@@ -12,10 +12,12 @@ def get_working_directory():
 
 def get_child_directories(directory):
     child_dirs = []
+    folder_names = []
     for path in Path(directory).iterdir():
         if path.is_dir():
             child_dirs.append(path)
-    return child_dirs
+            folder_names.append(path.name)
+    return child_dirs, folder_names
 
 
 def set_working_directory(directory):

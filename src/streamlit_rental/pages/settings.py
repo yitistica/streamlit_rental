@@ -32,8 +32,8 @@ def _set_app(directory, app_name):
 def set_app():
     c1, c2, c3 = st.beta_columns((1, 5, 1))
     working_directory_path = get_working_directory()
-    app_dirs = get_child_directories(working_directory_path)
-    selected_app = c2.selectbox("APP 地址", app_dirs)
+    app_dirs, folder_names = get_child_directories(working_directory_path)
+    selected_app = c2.selectbox("APP 地址", folder_names)
     set_button = c2.button("选择 APP", key='set app button')
 
     if selected_app and set_button:
