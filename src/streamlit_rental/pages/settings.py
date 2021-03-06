@@ -1,16 +1,19 @@
 import streamlit as st
 from streamlit_rental.utils.sys import check_if_dir_exists, get_working_directory, \
-    set_working_directory, get_child_directories
+    set_working_directory, get_child_directories, join_paths
 from streamlit_rental.rental.init_application import create_app
+
+from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH
 
 
 def _status_indication():
     pass
 
 
-def _set_workspace(directory):
+def set_workspace_to_dir(directory):
     if check_if_dir_exists(directory=directory):
         set_working_directory(directory=directory)
+        STATE_DICT['configs']['workspace_path'] = directory
         st.success('完成设置工作空间。')
     else:
         st.error(f'路径<{directory}>不存在，请重新设置。')
@@ -18,15 +21,15 @@ def _set_workspace(directory):
 
 def set_workspace():
     c1, c2, c3 = st.beta_columns((1, 5, 1))
-    set_dir = c2.text_input("工作空间路径，e.g., C:/Users/workspace/",
-                            'C:/Users/yeech/Desktop/streamlit_rental_working_directory')
+    set_dir = c2.text_input("工作空间路径，e.g., C:/Users/workspace/", DEFAULT_WORK_SPACE_PATH)
     set_button = c2.button("更改", key='change working dir buttom')
     if set_dir and set_button:
-        _set_workspace(directory=set_dir)
+        set_workspace_to_dir(directory=set_dir)
 
 
-def _set_app(directory, app_name):
-    pass
+def set_app_dir(directory, app_name):
+    STATE_DICT['configs']['app_name'] = app_name
+    STATE_DICT['configs']['app_path'] = join_paths(directory, app_name)
 
 
 def set_app():
@@ -38,7 +41,7 @@ def set_app():
 
     if selected_app and set_button:
         # check all the file names:
-        _set_app(directory=working_directory_path, app_name=selected_app)
+        set_app_dir(directory=working_directory_path, app_name=selected_app)
         st.success('完成设置APP。')
 
 
@@ -46,7 +49,7 @@ def _init_new_app(directory):
     if check_if_dir_exists(directory=directory):
         create_app(dir_path=directory)
         st.success('完成创建新的管理APP。')
-        _set_workspace(directory)
+        set_workspace_to_dir(directory)
     else:
         st.error(f'路径<{directory}>不存在，请重新设置。')
 

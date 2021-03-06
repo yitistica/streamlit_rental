@@ -30,3 +30,4 @@ def create_app(dir_path):
 
     # create db:
     init_database(dir_path=app_path, db_name=DB_NAME)
+
