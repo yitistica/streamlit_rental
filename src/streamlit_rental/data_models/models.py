@@ -1,5 +1,5 @@
 from sqlalchemy_utils import ChoiceType
-from sqlalchemy import Table, Column, Integer, String, DateTime, Float, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, Enum
 
 from streamlit_rental.data_models.declarative import Base
 
