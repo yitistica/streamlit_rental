@@ -145,4 +145,3 @@ class Billables(Base):
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='gender')),
                     default='pending', nullable=False)
     remarks = Column('remarks', String, nullable=False)
-

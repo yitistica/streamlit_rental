@@ -1,10 +1,31 @@
 from streamlit_rental.data_models import create_Session
 from streamlit_rental.configs import STATE_DICT
 from sqlalchemy.inspection import inspect
+from sqlalchemy import types
+from sqlalchemy_utils import ChoiceType
 
 
 def Session_factory():
     STATE_DICT['Session'] = create_Session(db_path=STATE_DICT['configs']['app_db_path'])
+
+
+def get_column_type(sqltype):
+    if isinstance(sqltype, types.Float):
+        return 'float'
+    elif isinstance(sqltype, types.String):
+        return 'str'
+    elif isinstance(sqltype, types.Integer):
+        return 'int'
+    elif isinstance(sqltype, types.Date):
+        return 'date'
+    elif isinstance(sqltype, types.DateTime):
+        return 'datetime'
+    elif isinstance(sqltype, types.Boolean):
+        return 'bool'
+    elif isinstance(sqltype, ChoiceType):
+        return 'choice'
+    else:
+        return None
 
 
 class Connection(object):
@@ -20,6 +41,21 @@ class Connection(object):
 
     def get_columns(self):
         return [column.name for column in inspect(self.orm).c]
+
+    def get_table_column_desc(self):
+        mapper = inspect(self.orm).c
+
+        desc_dict = dict()
+        for column in mapper:
+            desc_dict[column.name] = dict()
+            desc_dict[column.name]['type'] = get_column_type(column.type)
+            desc_dict[column.name]['nullable'] = column.nullable
+            desc_dict[column.name]['default'] = column.default.arg if column.default else None
+            desc_dict[column.name]['choices'] = column.type.choices \
+                if desc_dict[column.name]['type'] == 'choice' else None
+            # desc_dict[column.name]['nullable'] = dir(column)
+
+        return desc_dict
 
     def create_session(self):
         self._session = STATE_DICT['Session']()

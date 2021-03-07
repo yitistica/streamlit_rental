@@ -16,7 +16,9 @@ def _add_manager(**kwargs):
 def main():
     my_expander = st.beta_expander("管理者", expanded=False)
     with my_expander:
-        st.markdown(STATE_DICT)
+        manager_connection = ManagerConnection()
+
+        st.markdown(manager_connection.get_table_column_desc())
 
 
 
