@@ -86,3 +86,4 @@ def add_simple_form(column, connection, key, ignore):
 
             connection.add_by_dict(form)
             column.success(f'成功提交')
+        connection.close()

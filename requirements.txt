@@ -2,3 +2,5 @@ streamlit
 plotly
 itchat
 sqlalchemy-utils
+streamlit-ace
+sqlalchemy
