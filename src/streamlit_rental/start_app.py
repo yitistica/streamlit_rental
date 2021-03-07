@@ -40,4 +40,3 @@ def main():
     page = PAGES[selection]
     page.main()
 
-

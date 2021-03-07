@@ -1,15 +1,16 @@
 import streamlit as st
 from streamlit_rental.configs import STATE_DICT
+from streamlit_rental.rental.manager import ManagerConnection
 
 
 def _individual_manager_card():
     pass
 
 
-
 def _add_manager(**kwargs):
-    pass
-
+    manager_connection = ManagerConnection()
+    manager_connection.add_manager(**kwargs)
+    manager_connection.close()
 
 
 def main():

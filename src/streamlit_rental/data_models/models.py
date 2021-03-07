@@ -102,6 +102,7 @@ class Contract(Base):
     start_date = Column('start_date', DateTime, nullable=False)
     end_date = Column('end_date', DateTime, nullable=False)
     terms = Column(Integer, ForeignKey('terms.id'))
+    issuer = Column(Integer, ForeignKey('manager.id'))
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='gender')),
                     default='not signed', nullable=False)
 
