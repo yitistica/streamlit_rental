@@ -10,4 +10,3 @@ class ManagerConnection(Connection):
     def add_manager(self, **kwargs):
         instance = self.instanate_orm(**kwargs)
         self.add(instance)
-

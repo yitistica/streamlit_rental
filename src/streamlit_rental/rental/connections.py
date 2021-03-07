@@ -51,11 +51,17 @@ class Connection(object):
             desc_dict[column.name]['type'] = get_column_type(column.type)
             desc_dict[column.name]['nullable'] = column.nullable
             desc_dict[column.name]['default'] = column.default.arg if column.default else None
-            desc_dict[column.name]['choices'] = column.type.choices \
+            desc_dict[column.name]['choices'] = [choice[0] for choice in column.type.choices] \
                 if desc_dict[column.name]['type'] == 'choice' else None
-            # desc_dict[column.name]['nullable'] = dir(column)
+            desc_dict[column.name]['comment'] = column.comment
 
         return desc_dict
+
+    def get_table_name(self):
+        return self.orm.__tablename__
+
+    def get_table_alias(self):
+        return self.orm.__table_args__['comment']
 
     def create_session(self):
         self._session = STATE_DICT['Session']()
@@ -71,6 +77,10 @@ class Connection(object):
                 raise TypeError(f"instance {instance} of type {type(instance)} is not an instance of {self.orm}.")
 
         self.commit()
+
+    def add_by_dict(self, kwargs):
+        instance = self.instanate_orm(**kwargs)
+        self.add(instance)
 
     def flush(self):
         self.session.flush()
