@@ -29,15 +29,6 @@ class Owner(Person):
     id = Column(Integer, ForeignKey('person.id'), primary_key=True, comment='编号')
 
 
-class Manager(Person):
-    __tablename__ = 'manager'
-    __table_args__ = {'comment': '管理者'}
-
-    id = Column(Integer, ForeignKey('person.id'), primary_key=True, comment='编号')
-    access_key = Column('access_key', String, nullable=False, comment='访问权限密码')
-    manage_key = Column('manage_key', String, nullable=False, comment='管理权限密码')
-
-
 class Customer(Person):
     __tablename__ = 'customer'
     __table_args__ = {'comment': '客户'}
@@ -64,7 +55,6 @@ class RentalUnit(Base):
     unit = Column('unit', String, nullable=False, comment='单元')
     property = Column(String, ForeignKey('property.id'), comment='产权编号')
     owner = Column(String, ForeignKey('owner.id'), comment='所有者')
-    manager = Column(String, ForeignKey('manager.id'), comment='管理者')
 
 
 class ContractTemplate(Base):
@@ -73,11 +63,8 @@ class ContractTemplate(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     create_time = Column('create_time', DateTime, nullable=False, comment='创建时间')
-    update_time = Column('update_time', DateTime, nullable=False, comment='更新时间')
-    create_author = Column(String, ForeignKey('manager.id'), comment='创建者')
-    update_author = Column(String, ForeignKey('manager.id'), comment='更新作者')
-    template_title = Column('template_title', String, nullable=False, comment='标题')
-    template_content = Column('template_content', String, nullable=False, comment='内容')
+    title = Column('title', String, nullable=False, comment='标题')
+    content = Column('content', String, nullable=False, comment='内容')
 
 
 class Regularities(Base):
@@ -85,8 +72,9 @@ class Regularities(Base):
     __table_args__ = {'comment': '常规项'}
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
-    type = Column('type', String, nullable=False, comment='常规项类别')
-    items = Column('items', String, nullable=True, comment='常规项集')
+    create_time = Column('create_time', DateTime, nullable=False, comment='创建时间')
+    title = Column('title', String, nullable=False, comment='标题')
+    set = Column('set', String, nullable=False, comment='常规项集')
 
 
 class Terms(Base):
@@ -96,8 +84,8 @@ class Terms(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     templates = Column(String, ForeignKey('contract_template.id'), comment='合同模板编号')
+    regularities = Column(Integer, ForeignKey('regularities.id'), comment='合同常规项')
     provisions = Column('provisions', String, nullable=True, comment='其它規定')
-    regularities = Column(Integer, ForeignKey('regularities.id'), comment='常规项编号')  # format;
 
 
 class Contract(Base):
@@ -120,19 +108,8 @@ class Contract(Base):
     start_date = Column('start_date', DateTime, nullable=False, comment='开始时间')
     end_date = Column('end_date', DateTime, nullable=False, comment='结束时间')
     terms = Column(Integer, ForeignKey('terms.id'), comment='条款')
-    issuer = Column(Integer, ForeignKey('manager.id'), comment='合同拟定者')
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='status')),
                     default='无效', nullable=False, comment='状态')
-
-
-class Session(Base):
-    __tablename__ = 'session'
-    __table_args__ = {'comment': '管理交互'}
-
-    id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
-    session_date = Column('session_date', DateTime, nullable=False, comment='交互开始时间')
-    contract_id = Column(String, ForeignKey('contract.id'), comment='合同编号')
-    manager = Column(String, ForeignKey('manager.id'), comment='管理者')
 
 
 class Usage(Base):
@@ -140,7 +117,6 @@ class Usage(Base):
     __table_args__ = {'comment': '常规使用'}
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
-    session_id = Column(String, ForeignKey('session.id'), comment='交互编号')
     item = Column('item', String, nullable=False, comment='项目')
     value = Column('value', Float, nullable=False, comment='值')
     start_date = Column('start_date', DateTime, nullable=False, comment='项目对应开始时间')
@@ -160,13 +136,14 @@ class Billables(Base):
         ('拖欠', '拖欠'),
         ('宽免', '宽免'),
         ('坏账', '坏账'),
+        ('返还', '返还'),
     ]
     STATUSES = tuple(i[0] for i in STATUS_CHOICES)
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
-    session_id = Column(String, ForeignKey('session.id'), comment='交互编号')
     item = Column('item', String, nullable=False, comment='计费项目')
-    value = Column('value', Float, nullable=False, comment='费用')
+    volumn = Column('volumn', Float, nullable=False, comment='项目数量')
+    value = Column('value', Float, nullable=False, comment='总费用')
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='status')),
                     default='生成', nullable=False, comment='状态')
     remarks = Column('remarks', String, nullable=True, comment='费用旁注')

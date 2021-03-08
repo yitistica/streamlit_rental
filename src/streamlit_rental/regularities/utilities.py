@@ -1,7 +1,0 @@
-"""
-regularity = {
-
-utility = {
-
-
-"""
