@@ -14,10 +14,12 @@ class ContractTemplateConnection(Connection):
                 order_by(desc(ContractTemplate.update_time)):
             all_templates.append(info_tuple)
 
+        self.session.close()
         return all_templates
 
     def query_by_template_id(self, id_):
         template = self.session.query(ContractTemplate).filter(ContractTemplate.id == id_).first()
+
         return template
 
 

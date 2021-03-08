@@ -4,7 +4,7 @@ from streamlit_rental.utils.sys import check_if_dir_exists, get_working_director
 from streamlit_rental.rental.init_application import create_app
 from streamlit_rental.rental.connections import Session_factory
 from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH, DB_NAME
-from streamlit_rental.utils.display_components import convert_a_dict_to_table
+from streamlit_rental.pages.utils.display_components import convert_a_dict_to_table
 
 
 def _status_indication():

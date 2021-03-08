@@ -37,7 +37,12 @@ def add_template_section():
             render_button = st.button('排版', key=f"模板排版提交")
             save_button = st.button('存档', key=f"模板存档提交")
             clear_button = st.button('清空', key=f"模板清空提交")
-            submit_button = st.button('模板入库', key=f"模板入库提交")
+            submit_button = st.button('新加模板入库', key=f"新加模板入库提交")
+
+            if selected_template[0] != -1:
+                modify_submit_button = st.button('修改模板入库', key=f"修改模板入库提交")
+            else:
+                modify_submit_button = st.write(key='修改模板入库提交 placeholder')
 
         with c2:
             if selected_template[0] == -1:  # new template
@@ -63,7 +68,7 @@ def add_template_section():
                 template_dict = {'create_time': datetime.datetime.now(),
                                  'update_time': datetime.datetime.now(),
                                  'create_author': 1,
-                                 'update_author': 1,
+                                 'update_author': 1,  # TODO FIX after author
                                  'template_title': title,
                                  'template_content': content}
 
@@ -74,7 +79,17 @@ def add_template_section():
                 _saved_title[0] = _default_title
                 _saved_content[0] = _default_content
                 st.success(f'成功提交')
+            elif modify_submit_button:
+                if selected_template[0] != -1:
+                    connection = ContractTemplateConnection()
+                    template = connection.query_by_template_id(id_=selected_template[0])
+                    template.update_time = datetime.datetime.now()
+                    template.update_author = 1  # TODO
+                    template.template_title = title
+                    template.template_content = content
 
+                    connection.commit()
+                    connection.close()
         with c2:
             st.markdown('#### 预览排版结果')
             if render_button:
