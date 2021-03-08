@@ -2,6 +2,8 @@ import streamlit as st
 from streamlit_rental.pages import settings, admission, management, contracts
 from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH
 
+from streamlit_rental.rental.manager import ManagerConnection
+
 PAGES = {
     '客户管理': admission,
     '合同管理': contracts,
@@ -32,11 +34,18 @@ def _init_app():
 
 
 def main():
+    _init_app()
+
     title = st.empty()
     st.sidebar.title("房屋管理平台")
-    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+    all_managers = ManagerConnection().all_managers()
+    _selected_manager = st.sidebar.selectbox(label='选择管理者',
+                                             options=all_managers, key=f"选择管理者 sidebar",
+                                             format_func=lambda x: x[1])
+    if _selected_manager:
+        STATE_DICT['session']['current_manager'] = _selected_manager
 
-    _init_app()
+    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
     page = PAGES[selection]
     page.main()

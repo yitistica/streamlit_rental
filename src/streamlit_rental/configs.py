@@ -9,5 +9,6 @@ DB_NAME = 'rental.db'
 
 DEFAULT_WORK_SPACE_PATH = 'C:/Users/yeech/Desktop/streamlit_rental_working_directory/'
 
-STATE_DICT = {'configs': {}}  # for keeeping state;
+STATE_DICT = {'configs': {},
+              'session': {}}  # for keeeping state;
 
