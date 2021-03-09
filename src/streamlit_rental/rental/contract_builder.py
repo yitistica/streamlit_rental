@@ -1,15 +1,18 @@
 from streamlit_rental.data_models.models import ContractTemplate, Regularities, Terms
 from streamlit_rental.rental.connections import Connection
+from streamlit_rental.rental.regularities import COL_TRANSLATION
 from sqlalchemy import desc
 
 import json
+import pandas as pd
+
 
 class ContractTemplateConnection(Connection):
 
     def __init__(self):
         super().__init__(orm=ContractTemplate)
 
-    def all_template_titles(self):
+    def all_titles(self):
         all_templates = []
         for info_tuple in self.session.query(ContractTemplate.id, ContractTemplate.title).\
                 order_by(desc(ContractTemplate.create_time)):
@@ -51,9 +54,24 @@ class RegularitiesConnection(Connection):
     def convert_dicts_to_set_str(regularities_set_dict):
         return json.dumps(regularities_set_dict)
 
+    @staticmethod
+    def convert_dicts_to_df(regularities_set_str):
+        regularities_set_dict = RegularitiesConnection.convert_set_str_to_dicts(regularities_set_str)
+        df = pd.DataFrame(regularities_set_dict)
+        df = df.rename(columns=COL_TRANSLATION)
+        return df
+
 
 class TermsConnection(Connection):
 
     def __init__(self):
         super().__init__(orm=Terms)
 
+    def all_titles(self):
+        all_titles = []
+        for info_tuple in self.session.query(Terms.id, Terms.title).\
+                order_by(desc(Terms.create_time)):
+            all_titles.append(info_tuple)
+
+        self.session.close()
+        return all_titles

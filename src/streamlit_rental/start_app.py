@@ -4,7 +4,7 @@ from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH
 
 PAGES = {
         '客户管理': admission,
-        '合同管理': contracts,
+        '合同模板': contracts,
         '房屋管理': admission,
         '所有者页面': ownership,
         "设置": settings,

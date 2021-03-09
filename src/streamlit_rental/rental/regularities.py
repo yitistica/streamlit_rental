@@ -12,6 +12,9 @@ _REGULARITIES = [{'type': "水电煤气", 'item': "水费", "unit": '单元价',
                  {'type': "押金", 'item': "押金", "unit": '次', 'frequency': "合同开始日", 'price': 1000}]
 
 
+COL_TRANSLATION = {"type": "类型", "item": "收费项", "unit": "收费单位", "frequency": "频次", "price": "价格"}
+
+
 class RegularityParser(object):
 
     def __init__(self, regularities=None):

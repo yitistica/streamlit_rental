@@ -83,9 +83,10 @@ class Terms(Base):
     __table_args__ = {'comment': '条款'}
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
-    templates = Column(String, ForeignKey('contract_template.id'), comment='合同模板编号')
+    title = Column('title', String, nullable=False, comment='条款名')
+    create_time = Column('create_time', DateTime, nullable=False, comment='创建时间')
+    template = Column(Integer, ForeignKey('contract_template.id'), comment='合同模板编号')
     regularities = Column(Integer, ForeignKey('regularities.id'), comment='合同常规项')
-    provisions = Column('provisions', String, nullable=True, comment='其它規定')
 
 
 class Contract(Base):
@@ -97,7 +98,7 @@ class Contract(Base):
         ('生效中', '生效中'),
         ('终止', '终止'),
         ('过期', '过期'),
-        ('其它', '其它'),
+        ('完结', '完结'),
     ]
 
     STATUSES = tuple(i[0] for i in STATUS_CHOICES)
@@ -108,6 +109,7 @@ class Contract(Base):
     start_date = Column('start_date', DateTime, nullable=False, comment='开始时间')
     end_date = Column('end_date', DateTime, nullable=False, comment='结束时间')
     terms = Column(Integer, ForeignKey('terms.id'), comment='条款')
+    provisions = Column('provisions', String, nullable=True, comment='其它規定')
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='status')),
                     default='无效', nullable=False, comment='状态')
 
