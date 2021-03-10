@@ -1,7 +1,8 @@
 from sqlalchemy_utils import ChoiceType
 from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, Enum
-
+from sqlalchemy.orm import relationship
 from streamlit_rental.data_models.declarative import Base
+from sqlalchemy.orm import validates
 
 
 class Person(Base):
@@ -28,14 +29,23 @@ class Owner(Person):
 
     id = Column(Integer, ForeignKey('person.id'), primary_key=True, comment='编号')
 
+    rental_units = relationship('RentalUnit', back_populates='owner')
+
 
 class Customer(Person):
     __tablename__ = 'customer'
     __table_args__ = {'comment': '客户'}
 
     id = Column(Integer, ForeignKey('person.id'), primary_key=True, comment='编号')
-    nid = Column('nid', String, nullable=False, comment='身份证明')
+    nid = Column('nid', String, nullable=False, comment='身份证明', unique=True)
     date_of_birth = Column('date of birth', DateTime, nullable=False, comment='生日日期')
+    create_time = Column('create_time', DateTime, nullable=False, comment='创建时间')
+    primary_contact_no = Column('primary_contact_no', String, nullable=False, comment='主联系号码')
+    supplementary_contact_no = Column('supplementary_contact_no', String, nullable=True, comment='次联系号码')
+    wechat_account = Column('wechat_account', String, nullable=True, comment='微信联系')
+    alipay_account = Column('alipay_account', String, nullable=True, comment='支付宝联系')
+
+    contract = relationship('Contract', back_populates='customer')
 
 
 class Property(Base):
@@ -46,6 +56,8 @@ class Property(Base):
     address = Column('address', String, nullable=False, comment='地址')
     alias = Column('alias', String, nullable=True, comment='别称')
 
+    rental_units = relationship('RentalUnit', back_populates='property')
+
 
 class RentalUnit(Base):
     __tablename__ = 'rental_unit'
@@ -53,8 +65,11 @@ class RentalUnit(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     unit = Column('unit', String, nullable=False, comment='单元')
-    property = Column(String, ForeignKey('property.id'), comment='产权编号')
-    owner = Column(String, ForeignKey('owner.id'), comment='所有者')
+    property_id = Column(String, ForeignKey('property.id'), comment='产权编号')
+    owner_id = Column(String, ForeignKey('owner.id'), comment='所有者')
+
+    property = relationship('Property', back_populates='rental_units')
+    owner = relationship('Owner', back_populates='rental_units')
 
 
 class ContractTemplate(Base):
@@ -85,8 +100,11 @@ class Terms(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     title = Column('title', String, nullable=False, comment='条款名')
     create_time = Column('create_time', DateTime, nullable=False, comment='创建时间')
-    template = Column(Integer, ForeignKey('contract_template.id'), comment='合同模板编号')
-    regularities = Column(Integer, ForeignKey('regularities.id'), comment='合同常规项')
+    template_id = Column(Integer, ForeignKey('contract_template.id'), comment='合同模板编号')
+    regularities_id = Column(Integer, ForeignKey('regularities.id'), comment='合同常规项')
+
+    template = relationship('ContractTemplate')
+    regularities = relationship('Regularities')
 
 
 class Contract(Base):
@@ -105,13 +123,16 @@ class Contract(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     rental_id = Column(Integer, ForeignKey('rental_unit.id'), comment='单元编号')
-    primary_customer = Column(Integer, ForeignKey('customer.id'), comment='客户编号')
+    customer_id = Column(Integer, ForeignKey('customer.id'), comment='客户编号')
     start_date = Column('start_date', DateTime, nullable=False, comment='开始时间')
     end_date = Column('end_date', DateTime, nullable=False, comment='结束时间')
-    terms = Column(Integer, ForeignKey('terms.id'), comment='条款')
+    terms_id = Column(Integer, ForeignKey('terms.id'), comment='条款')
     provisions = Column('provisions', String, nullable=True, comment='其它規定')
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='status')),
                     default='无效', nullable=False, comment='状态')
+
+    customer = relationship('Customer', back_populates='contract')
+    terms = relationship("Terms")
 
 
 class Usage(Base):
@@ -119,10 +140,13 @@ class Usage(Base):
     __table_args__ = {'comment': '常规使用'}
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
+    contract_id = Column(Integer, ForeignKey('contract.id'), comment='合同编号')
     item = Column('item', String, nullable=False, comment='项目')
     value = Column('value', Float, nullable=False, comment='值')
     start_date = Column('start_date', DateTime, nullable=False, comment='项目对应开始时间')
     end_date = Column('end_date', DateTime, nullable=False, comment='项目对应结束时间')
+
+    contract = relationship('Contract')
 
 
 class Billables(Base):
@@ -143,9 +167,12 @@ class Billables(Base):
     STATUSES = tuple(i[0] for i in STATUS_CHOICES)
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
+    usage_id = Column(Integer, ForeignKey('usage.id'), comment='常规使用编号')
     item = Column('item', String, nullable=False, comment='计费项目')
     volumn = Column('volumn', Float, nullable=False, comment='项目数量')
     value = Column('value', Float, nullable=False, comment='总费用')
     status = Column('status', ChoiceType(STATUS_CHOICES, impl=Enum(*STATUSES, name='status')),
                     default='生成', nullable=False, comment='状态')
     remarks = Column('remarks', String, nullable=True, comment='费用旁注')
+
+    usage = relationship('Usage')
