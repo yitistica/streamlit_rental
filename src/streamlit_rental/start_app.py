@@ -1,12 +1,11 @@
 import streamlit as st
-from streamlit_rental.pages import settings, admission, contract_builder, ownership, customers
+from streamlit_rental.pages import settings, contract_builder, properties, customers
 from streamlit_rental.configs import STATE_DICT, DEFAULT_WORK_SPACE_PATH
 
 PAGES = {
         '客户管理': customers,
         '合同模板': contract_builder,
-        '房屋管理': admission,
-        '所有者页面': ownership,
+        '房屋管理': properties,
         "设置": settings,
     }
 

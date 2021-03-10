@@ -1,4 +1,5 @@
 import datetime
+import streamlit as st
 
 global_value_translations = {}
 
@@ -6,7 +7,21 @@ global_value_translations = {}
 global_column_translations = {}
 
 
-def add_simple_form(column, connection, key, ignore):
+def add_simple_form(selection_column, column, Connection, key, ignore):
+    with selection_column:
+        connection = Connection()
+        all_instances = connection.all()  # with all method
+        new_instance = connection.instanate_orm()
+        all_instances.insert(0, new_instance)
+
+        label = connection.get_table_alias()
+        selected_instance = st.selectbox(label=f'选择{label}',
+                                         options=all_instances, key=f"选择{label}",
+                                         format_func=lambda x: Connection.make_label(x))
+
+        submit_button = st.button('提交', key=f"{key}_{label}_submit")
+        cancel_button = st.button('取消', key=f"{key}_{label}_cancel")
+
     with column:
         col_desc = connection.get_table_column_desc()
         table_name = connection.get_table_name()
@@ -24,7 +39,10 @@ def add_simple_form(column, connection, key, ignore):
                 col_label = col
 
             # default:
-            default = column_info['default']
+            if not selected_instance.id:
+                default = column_info['default']
+            else:
+                default = getattr(selected_instance, col)
 
             if col in ignore:
                 continue
@@ -76,14 +94,24 @@ def add_simple_form(column, connection, key, ignore):
                                                       key=col_key)
 
             form[col] = col_input
-        submit_button = column.button('提交', key=f"{key}_{table_name}")
+
         if submit_button:
-            # check nullable:
             for col, col_input in form.items():
                 if (not col_desc[col]['nullable']) and (not form[col]):
                     column.error(f'字段<{col}>不能为空。')
                     column.stop()
 
-            connection.add_by_dict(form)
+            if not selected_instance.id:  # new
+                connection.add_by_dict(form)
+                connection.close()
+            else:
+                selected_instance = connection.query_by_id(id_=selected_instance.id)
+                for col, value in form.items():
+                    setattr(selected_instance, col, value)
+                connection.commit()
+                connection.close()
+
             column.success(f'成功提交')
-        connection.close()
+
+        elif cancel_button:
+            st.stop()

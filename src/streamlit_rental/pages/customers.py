@@ -101,6 +101,8 @@ def add_customer_section():
                         connection.commit()
                         connection.close()
 
+                    st.success(f'成功提交')
+
             elif cancel_button:
                 st.stop()
 
