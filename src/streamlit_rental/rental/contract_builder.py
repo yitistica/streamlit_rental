@@ -67,6 +67,19 @@ class TermsConnection(Connection):
     def __init__(self):
         super().__init__(orm=Terms)
 
+    def query_by_id(self, id_):
+        terms = self.session.query(self.orm).filter(self.orm.id == id_).first()
+
+        return terms
+
+    def all(self):
+        all_instances = []
+        for instance in self.session.query(self.orm).order_by(desc(self.orm.id)):
+            all_instances.append(instance)
+
+        self.session.close()
+        return all_instances
+
     def all_titles(self):
         all_titles = []
         for info_tuple in self.session.query(Terms.id, Terms.title).\
@@ -75,3 +88,14 @@ class TermsConnection(Connection):
 
         self.session.close()
         return all_titles
+
+    @staticmethod
+    def make_label(instance):
+        if not instance.id:
+            return '新合同条款'
+        elif instance.id and instance.title:
+            return f"{instance.id}. {instance.title}"
+        elif instance.title:
+            return instance.title
+        else:
+            return instance.id

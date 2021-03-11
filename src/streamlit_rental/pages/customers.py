@@ -3,17 +3,13 @@ from streamlit_rental.rental.customer import CustomerConnection
 import datetime
 
 
-def _individual_customer_card():
-    pass
-
-
 def add_customer_section():
     my_expander = st.beta_expander("增加住户", expanded=False)
     with my_expander:
         c1, c2, c3, c4 = st.beta_columns((2, 1, 3, 1))
 
         with c1:
-            all_customers = CustomerConnection().all_customer_info()
+            all_customers = CustomerConnection().all()
             new_customer = CustomerConnection().instanate_orm()
             all_customers.insert(0, new_customer)
 
@@ -49,6 +45,10 @@ def add_customer_section():
                                            if selected_customer.wechat_account else '', key='增加住户_微信联系')
             alipay_account = st.text_input(label='支付宝联系', value=selected_customer.alipay_account \
                 if selected_customer.alipay_account else '', key='增加住户_支付宝联系')
+            emergency_contact = st.text_input(label='紧急联系人', value=selected_customer.emergency_contact \
+                if selected_customer.emergency_contact else '', key='增加住户_紧急联系人')
+            emergency_contact_no = st.text_input(label='紧急联系人号码', value=selected_customer.emergency_contact_no \
+                if selected_customer.emergency_contact_no else '', key='增加住户_紧急联系人号码')
 
             if submit_button:
                 repeated_customer = CustomerConnection().query_by_nid(nid)
@@ -83,6 +83,8 @@ def add_customer_section():
                         new_customer.wechat_account = wechat_account
                         new_customer.alipay_account = alipay_account
                         new_customer.create_time = datetime.datetime.now()
+                        new_customer.emergency_contact = emergency_contact
+                        new_customer.emergency_contact_no = emergency_contact_no
                         CustomerConnection().add(new_customer)
                     else:
                         connection = CustomerConnection()
@@ -97,6 +99,8 @@ def add_customer_section():
                         selected_customer.supplementary_contact_no = supplementary_contact_no
                         selected_customer.wechat_account = wechat_account
                         selected_customer.alipay_account = alipay_account
+                        new_customer.emergency_contact = emergency_contact
+                        new_customer.emergency_contact_no = emergency_contact_no
                         selected_customer.create_time = datetime.datetime.now()
                         connection.commit()
                         connection.close()

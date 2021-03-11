@@ -10,7 +10,7 @@ class CustomerConnection(Connection):
     def __init__(self):
         super().__init__(orm=Customer)
 
-    def all_customer_info(self):
+    def all(self):
         all_customers = []
         for customer in self.session.query(Customer).order_by(desc(Customer.id)):
             all_customers.append(customer)
@@ -25,8 +25,6 @@ class CustomerConnection(Connection):
 
     def query_by_nid(self, nid):
         customer = self.session.query(Customer).filter(Customer.nid == nid).first()
-
-        self.session.close()
         return customer
 
     def get_contracts(self, customer_id, filter_status=None):
@@ -39,7 +37,6 @@ class CustomerConnection(Connection):
             query = self.session.query(Contract).filter_by(Contract.customer_id == customer_id,
                                                            Contract.status in filter_status, ).all()
 
-        self.session.close()
         return query
 
     @staticmethod
@@ -82,3 +79,10 @@ class CustomerConnection(Connection):
             simplified_name = surname + given_name + ' (' + alias + ')'
 
         return f"{id_}. {simplified_name}"
+
+    @staticmethod
+    def make_label(instance):
+        return CustomerConnection.simplify_names(id_=instance.id,
+                                                 surname=instance.surname,
+                                                 given_name=instance.given_name,
+                                                 alias=instance.alias)

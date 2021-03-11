@@ -2,7 +2,6 @@ from sqlalchemy_utils import ChoiceType
 from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from streamlit_rental.data_models.declarative import Base
-from sqlalchemy.orm import validates
 
 
 class Person(Base):
@@ -44,6 +43,8 @@ class Customer(Person):
     supplementary_contact_no = Column('supplementary_contact_no', String, nullable=True, comment='次联系号码')
     wechat_account = Column('wechat_account', String, nullable=True, comment='微信联系')
     alipay_account = Column('alipay_account', String, nullable=True, comment='支付宝联系')
+    emergency_contact = Column('emergency_contact', String, nullable=True, comment='紧急联系人')
+    emergency_contact_no = Column('emergency_contact_no', String, nullable=True, comment='紧急联系人号码')
 
     contract = relationship('Contract', back_populates='customer')
 
