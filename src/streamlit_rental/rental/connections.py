@@ -54,6 +54,7 @@ class Connection(object):
             desc_dict[column.name]['choices'] = [choice[0] for choice in column.type.choices] \
                 if desc_dict[column.name]['type'] == 'choice' else None
             desc_dict[column.name]['comment'] = column.comment
+            desc_dict[column.name]['foreign_key'] = column.foreign_keys
 
         return desc_dict
 

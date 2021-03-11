@@ -1,4 +1,4 @@
-from streamlit_rental.data_models.models import Owner, Property
+from streamlit_rental.data_models.models import Owner, Property, RentalUnit
 from streamlit_rental.rental.connections import Connection
 from sqlalchemy import desc
 
@@ -59,5 +59,33 @@ class PropertyConnection(Connection):
             return '新产权'
         elif instance.alias:
             return instance.alias
+        else:
+            return instance.id
+
+
+class RentalUnitConnection(Connection):
+
+    def __init__(self):
+        super().__init__(orm=RentalUnit)
+
+    def all(self):
+        all_rentalunits = []
+        for unit in self.session.query(RentalUnit).order_by(desc(RentalUnit.id)):
+            all_rentalunits.append(unit)
+
+        self.session.close()
+        return all_rentalunits
+
+    def query_by_id(self, id_):
+        unit = self.session.query(RentalUnit).filter(RentalUnit.id == id_).first()
+
+        return unit
+
+    @staticmethod
+    def make_label(instance):
+        if not instance.id:
+            return '新单元'
+        elif instance.unit:
+            return f"{instance.unit}"
         else:
             return instance.id

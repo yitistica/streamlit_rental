@@ -65,8 +65,9 @@ class RentalUnit(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True, comment='编号')
     unit = Column('unit', String, nullable=False, comment='单元')
-    property_id = Column(String, ForeignKey('property.id'), comment='产权编号')
-    owner_id = Column(String, ForeignKey('owner.id'), comment='所有者')
+    description = Column('description', String, nullable=True, comment='描述')
+    property_id = Column(Integer, ForeignKey('property.id'), comment='产权编号')
+    owner_id = Column(Integer, ForeignKey('owner.id'), comment='所有者')
 
     property = relationship('Property', back_populates='rental_units')
     owner = relationship('Owner', back_populates='rental_units')
